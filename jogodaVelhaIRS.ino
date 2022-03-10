@@ -88,7 +88,7 @@ int bits(int a, int b, int c) {
 // Verifica se o jogo acabou e retorna
 // quem ganhou ou velha
 int acabou() {
-  const int vezes = 50, intervalo = 20;
+  const int vezes = 20, intervalo = 50;
   int i, lado;
   // Verifica horizontais
   for (i = 1; i <= 9; i+=3) {
@@ -200,13 +200,16 @@ void loop() {
 
   // Se for a vez do jogador, vê que botão apertou
   if (vez == O) {
-    for (casa = 1; casa <= NUMCASAS; casa++) {
-      if (leBotao(casa)) {
-          // Se for um botão válido
-          if (aciona(casa)) {
-            vez = X;
-            lance++;
-          }
+    while (vez == O) {
+      for (casa = 1; casa <= NUMCASAS; casa++) {
+        if (leBotao(casa)) {
+            // Verifica se é um botão válido
+            if (aciona(casa)) {
+              vez = X;
+              lance++;
+              break;
+            }
+        }
       }
     }
   } else if (vez == X) {
