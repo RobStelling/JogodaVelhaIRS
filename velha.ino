@@ -14,32 +14,23 @@
  */
 #define ERRO -1
 
-int velhaRandomico(int tabuleiro[]) {
-  int casa;
-  // Cuidado: risco de loop infinito
-  do {
-    casa = random(NUMCASAS);
-  } while (tabuleiro[casa]);
-  return casa+1;
-}
-
 int faltaUm(int tabuleiro[], int lado) {
   int i;
   // Retorna a primeira casa que encontrar em que falte
   // uma peça para o lado escolhido
   // Horizontal
   for (i = 0; i < 9; i+=3) {
-    if ((tabuleiro[i] == VAZIO) &&
-        (tabuleiro[i+1] == lado) &&
-        (tabuleiro[i+2] == lado))
+    if (tabuleiro[i] == VAZIO &&
+        tabuleiro[i+1] == lado &&
+        tabuleiro[i+2] == lado)
       return i+1;
-    if ((tabuleiro[i+1] == VAZIO) &&
-        (tabuleiro[i] == lado) &&
-        (tabuleiro[i+2] == lado))
+    if (tabuleiro[i+1] == VAZIO &&
+        tabuleiro[i] == lado &&
+        tabuleiro[i+2] == lado)
       return i+2;
-    if ((tabuleiro[i+2] == VAZIO) &&
-        (tabuleiro[i+1] == lado) &&
-        (tabuleiro[i] == lado))
+    if (tabuleiro[i+2] == VAZIO &&
+        tabuleiro[i+1] == lado &&
+        tabuleiro[i] == lado)
       return i+3;
   }
   // Vertical
@@ -58,21 +49,70 @@ int faltaUm(int tabuleiro[], int lado) {
       return i+7;
   }
   // Diagonal principal
-  if (tabuleiro[0] == VAZIO && tabuleiro[4] == lado && tabuleiro[8] == lado)
+  if (tabuleiro[0] == VAZIO &&
+      tabuleiro[4] == lado &&
+      tabuleiro[8] == lado)
     return 1;
-  if (tabuleiro[4] == VAZIO && tabuleiro[0] == lado && tabuleiro[8] == lado)
+  if (tabuleiro[4] == VAZIO &&
+      tabuleiro[0] == lado &&
+      tabuleiro[8] == lado)
     return 5;
-  if (tabuleiro[8] == VAZIO && tabuleiro[4] == lado && tabuleiro[0] == lado)
+  if (tabuleiro[8] == VAZIO &&
+      tabuleiro[4] == lado &&
+      tabuleiro[0] == lado)
     return 9;
   // Diagonal secundária
-  if (tabuleiro[2] == VAZIO && tabuleiro[4] == lado && tabuleiro[6] == lado)
+  if (tabuleiro[2] == VAZIO &&
+      tabuleiro[4] == lado &&
+      tabuleiro[6] == lado)
     return 3;
-  if (tabuleiro[4] == VAZIO && tabuleiro[2] == lado && tabuleiro[6] == lado)
+  if (tabuleiro[4] == VAZIO &&
+      tabuleiro[2] == lado &&
+      tabuleiro[6] == lado)
     return 5;
-  if (tabuleiro[6] == VAZIO && tabuleiro[4] == lado && tabuleiro[2] == lado)
+  if (tabuleiro[6] == VAZIO &&
+      tabuleiro[4] == lado &&
+      tabuleiro[2] == lado)
     return 7;
   // Não tem casa vazia para completar
   return ERRO;
+}
+
+int cantoOposto(int tabuleiro[], int lado) {
+  int outroLado;
+  // Cantos 1, 3, 7, 9
+  outroLado = (lado == X ? O : X);
+  if (tabuleiro[0] == VAZIO && tabuleiro[8] == outroLado)
+    return 1;
+  if (tabuleiro[8] == VAZIO && tabuleiro[0] == outroLado)
+    return 9;
+  if (tabuleiro[2] == VAZIO && tabuleiro[6] == outroLado)
+    return 3;
+  if (tabuleiro[6] == VAZIO && tabuleiro[2] == outroLado)
+    return 7;
+  return ERRO;
+}
+
+int cantoVazio(int tabuleiro[]) {
+  // Cantos 1, 3, 7, 9
+  if (tabuleiro[0] == VAZIO)
+    return 1;
+  if (tabuleiro[8] == VAZIO)
+    return 9;
+  if (tabuleiro[2] == VAZIO)
+    return 3;
+  if (tabuleiro[6] == VAZIO)
+    return 7;
+  return ERRO;
+}
+
+int velhaRandomico(int tabuleiro[]) {
+  int casa;
+  // Cuidado: risco de loop infinito
+  do {
+    casa = random(NUMCASAS);
+  } while (tabuleiro[casa]);
+  return casa+1;
 }
 
 int velhaGanha(int tabuleiro[]) {
@@ -130,6 +170,12 @@ int velhaNewellESimon(int tabuleiro[]) {
   // Regra 5
   if (tabuleiro[4] == VAZIO)
     return 5;
+  // Regra 6
+  if ((casa = cantoOposto(tabuleiro, X)) != ERRO)
+    return casa;
+  // Regra 7
+  if ((casa = cantoVazio(tabuleiro)) != ERRO)
+    return casa;
 
   return velhaRandomico(tabuleiro);
   
