@@ -129,29 +129,6 @@ bool aciona(int casa) {
   return true;
 }
 
-// Lance do computador
-int velha(int tabuleiro[]) {
-  /*
-   * tabuleiro: 9 casas, numeradas de 1 a 9
-   *  1 | 2 | 3
-   * ---+---+---
-   *  4 | 5 | 6
-   * ---+---+---
-   *  7 | 8 | 9
-   * Cada casa pode conter:
-   * 0: Casa vazia
-   * 1: X - Computador
-   * 2: O - Humano
-   * Retorno: número da casa (entre 1 e 9) onde o computador jogará
-   */
-  int casa;
-  // Cuidado: risco de loop infinito
-  do {
-    casa = random(NUMCASAS);
-  } while (tabuleiro[casa]);
-  return casa+1;
-}
-
 // Prepara início do jogo
 void comecaJogo() {
   int casa;
@@ -214,7 +191,7 @@ void loop() {
     }
   } else if (vez == X) {
     // Senão é a vez do Arduino...
-    casa = velha(casas);
+    casa = velhaRandomico(casas);
     acende(X, casa);
     ocupa(casa, X);
     lance++;
