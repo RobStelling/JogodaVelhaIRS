@@ -12,6 +12,7 @@
  * 2: O - Humano
  * Retorno: número da casa (entre 1 e 9) onde o computador jogará
  */
+#define ERRO -1
 
 int velhaRandomico(int tabuleiro[]) {
   int casa;
@@ -21,6 +22,84 @@ int velhaRandomico(int tabuleiro[]) {
   } while (tabuleiro[casa]);
   return casa+1;
 }
+
+int faltaUm(int tabuleiro[], int lado) {
+  int i;
+  // Retorna a primeira casa que encontrar em que falte
+  // uma peça para o lado escolhido
+  // Horizontal
+  for (i = 0; i < 9; i+=3) {
+    if ((tabuleiro[i] == VAZIO) &&
+        (tabuleiro[i+1] == lado) &&
+        (tabuleiro[i+2] == lado))
+      return i+1;
+    if ((tabuleiro[i+1] == VAZIO) &&
+        (tabuleiro[i] == lado) &&
+        (tabuleiro[i+2] == lado))
+      return i+2;
+    if ((tabuleiro[i+2] == VAZIO) &&
+        (tabuleiro[i+1] == lado) &&
+        (tabuleiro[i] == lado))
+      return i+3;
+  }
+  // Vertical
+  for (i = 0; i < 3; i++) {
+    if (tabuleiro[i] == VAZIO &&
+        tabuleiro[i+3] == lado &&
+        tabuleiro[i+6] == lado)
+      return i+1;
+    if (tabuleiro[i+3] == VAZIO &&
+        tabuleiro[i] == lado &&
+        tabuleiro[i+6] == lado)
+      return i+4;
+    if (tabuleiro[i+6] == VAZIO &&
+        tabuleiro[i+3] == lado &&
+        tabuleiro[i] == lado)
+      return i+7;
+  }
+  // Diagonal principal
+  if (tabuleiro[0] == VAZIO && tabuleiro[4] == lado && tabuleiro[8] == lado)
+    return 1;
+  if (tabuleiro[4] == VAZIO && tabuleiro[0] == lado && tabuleiro[8] == lado)
+    return 5;
+  if (tabuleiro[8] == VAZIO && tabuleiro[4] == lado && tabuleiro[0] == lado)
+    return 9;
+  // Diagonal secundária
+  if (tabuleiro[2] == VAZIO && tabuleiro[4] == lado && tabuleiro[6] == lado)
+    return 3;
+  if (tabuleiro[4] == VAZIO && tabuleiro[2] == lado && tabuleiro[6] == lado)
+    return 5;
+  if (tabuleiro[6] == VAZIO && tabuleiro[4] == lado && tabuleiro[2] == lado)
+    return 7;
+  // Não tem casa vazia para completar
+  return ERRO;
+}
+
+int velhaGanha(int tabuleiro[]) {
+  // Se puder ganhar ganha
+  // Senão joga randomicamente
+  int casa;
+
+  if ((casa = faltaUm(tabuleiro, X)) != ERRO)
+    return casa;
+
+  return velhaRandomico(tabuleiro);
+}
+
+int velhaGanhaBloqueia(int tabuleiro[]) {
+  // Se puder ganhar ganha
+  // Se puder bloquear, bloqueia
+  // Senão joga randomicamente
+  int casa;
+
+  if ((casa = faltaUm(tabuleiro, X)) != ERRO)
+    return casa;
+  if ((casa = faltaUm(tabuleiro, O)) != ERRO)
+    return casa;
+
+  return velhaRandomico(tabuleiro);
+}
+
 int velhaNewellESimon(int tabuleiro[]) {
   /*
    * Implementação do algoritmo da velha de Newell e Simon de 1972
@@ -31,12 +110,27 @@ int velhaNewellESimon(int tabuleiro[]) {
    * 2. Bloquear: Se o oponente tiver duas peças em linha, ponha a terceira para bloqueá-lo.
    * 3. Triângulo: Crie uma oportunidade em que você poderá ganhar de duas maneiras.
    * 4. Bloquear o Triângulo do oponente:
-   *    Opção 1: Crie 2 peças em linha para forçar o oponente a se defender, contanto que não resulte nele criando um triângulo ou vencendo. Por exemplo, se 'X' tem dois cantos opostos do tabuleiro e 'O' tem o centro, 'O' não pode jogar num canto (Jogar no canto nesse cenário criaria um triângulo em que 'X' vence).
+   *    Opção 1: Crie 2 peças em linha para forçar o oponente a se defender, contanto que não resulte nele criando um triângulo ou vencendo.
+                 Por exemplo, se 'X' tem dois cantos opostos do tabuleiro e 'O' tem o centro, 'O' não pode jogar num canto
+                 (Jogar no canto nesse cenário criaria um triângulo em que 'X' vence).
    *    Opção 2: Se existe uma configuração em que o oponente pode formar um triângulo, bloqueiem-no.
    * 5. Centro: Jogue no centro.
    * 6. Canto oposto: Se o oponente está no canto, jogo no canto oposto.
    * 7. Canto vazio: jogue num canto vazio.
    * 8. Lado vazio: jogue na casa do meio de qualquer dos lados.
    */
+  int casa;
 
+  // Regra 1
+  if ((casa = faltaUm(tabuleiro, X)) != ERRO)
+    return casa;
+  // Regra 2
+  if ((casa = faltaUm(tabuleiro, O)) != ERRO)
+    return casa;
+  // Regra 5
+  if (tabuleiro[4] == VAZIO)
+    return 5;
+
+  return velhaRandomico(tabuleiro);
+  
 }

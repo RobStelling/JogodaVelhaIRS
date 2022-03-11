@@ -191,7 +191,7 @@ void loop() {
     }
   } else if (vez == X) {
     // Senão é a vez do Arduino...
-    casa = velhaRandomico(casas);
+    casa = velhaNewellESimon(casas);
     acende(X, casa);
     ocupa(casa, X);
     lance++;
