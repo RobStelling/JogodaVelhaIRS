@@ -258,8 +258,8 @@ int velhaNewellESimon(int tabuleiro[]) {
   if ((casa = cantoOposto(tabuleiro, X)) != ERRO)
     return casa;
   // Regra 7
-  //if ((casa = cantoVazio(tabuleiro)) != ERRO)
-  //  return casa;
+  if ((casa = cantoVazio(tabuleiro)) != ERRO)
+    return casa;
   // Regra 8
   if ((casa = ladoVazio(tabuleiro)) != ERRO)
     return casa;
