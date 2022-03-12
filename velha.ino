@@ -37,6 +37,7 @@ int opostoDiagonal(int canto) {
   return ERRO;
 }
 
+// Usado nas regras 1 e 2
 int faltaUm(int tabuleiro[], int lado) {
   // Retorna a primeira casa que encontrar em que falte
   // uma peça para o lado escolhido
@@ -61,6 +62,40 @@ int faltaUm(int tabuleiro[], int lado) {
   return ERRO;
 }
 
+// Usado na regra 3
+int triangulo(int tabuleiro[], int lado) {
+  int i;
+
+  // Primeira versão: casa a casa
+  if (tabuleiro[0]+tabuleiro[1]+tabuleiro[2] == lado) { // Então primeira linha pode ser usada nos testes
+    // Testa primeiro a própria casa em um AND para se aproveitar do "curto-circuito" de C
+    if (tabuleiro[0] == VAZIO && (tabuleiro[4]+tabuleiro[8] == lado || tabuleiro[3]+tabuleiro[6] == lado))
+      return 1;
+    if (tabuleiro[1] == VAZIO && (tabuleiro[4]+tabuleiro[7] == lado))
+      return 2;
+    if (tabuleiro[2] == VAZIO && (tabuleiro[4]+tabuleiro[6] == lado || tabuleiro[5]+tabuleiro[8] == lado))
+      return 3;
+  }
+  if (tabuleiro[3]+tabuleiro[4]+tabuleiro[5] == lado) { // Então segunda linha pode ser usada nos testes
+    if (tabuleiro[3] == VAZIO && (tabuleiro[0]+tabuleiro[6] == lado))
+      return 4;
+    if (tabuleiro[4] == VAZIO && (tabuleiro[0]+tabuleiro[8] == lado || tabuleiro[1]+tabuleiro[7] == lado || tabuleiro[2]+tabuleiro[6] == lado))
+      return 5;
+    if (tabuleiro[5] == VAZIO && (tabuleiro[2]+tabuleiro[8] == lado))
+      return 6;
+  }
+  if (tabuleiro[6]+tabuleiro[7]+tabuleiro[8] == lado) { // Então terceira linha pode ser usada nos testes
+    if (tabuleiro[6] == VAZIO && (tabuleiro[4]+tabuleiro[2] == lado || tabuleiro[3]+tabuleiro[0] == lado))
+      return 7;
+    if (tabuleiro[7] == VAZIO && (tabuleiro[4]+tabuleiro[1] == lado))
+      return 8;
+    if (tabuleiro[8] == VAZIO && (tabuleiro[4]+tabuleiro[0] == lado || tabuleiro[5]+tabuleiro[2] == lado))
+      return 9;
+  }
+  return ERRO;
+}
+
+// Usado na regra 5
 int cantoOposto(int tabuleiro[], int lado) {
   // Cantos 1, 3, 7, 9
   int i, outroLado, canto[] = {1, 3, 7, 9};
@@ -77,6 +112,7 @@ int cantoOposto(int tabuleiro[], int lado) {
   return ERRO;
 }
 
+// Usado na regra 7
 int cantoVazio(int tabuleiro[]) {
   // Cantos 1, 3, 7, 9
   int i, canto[] = {1, 3, 7, 9};
@@ -92,6 +128,7 @@ int cantoVazio(int tabuleiro[]) {
   return ERRO;
 }
 
+// Usado na regra 8
 int ladoVazio(int tabuleiro[]) {
   // Lados 2, 4, 6, 8
   int i, lados[] = {2, 4, 6, 8};
@@ -105,7 +142,6 @@ int ladoVazio(int tabuleiro[]) {
       return lados[i];
   }
   return ERRO;
-
 }
 
 // Algoritmos do jogo da velha
@@ -212,6 +248,8 @@ int velhaNewellESimon(int tabuleiro[]) {
   if ((casa = faltaUm(tabuleiro, O)) != ERRO)
     return casa;
   // Regra 3
+  if ((casa = triangulo(tabuleiro, X)) != ERRO)
+    return casa;
   // Regra 4
   // Regra 5
   if (tabuleiro[4] == VAZIO)
@@ -220,8 +258,8 @@ int velhaNewellESimon(int tabuleiro[]) {
   if ((casa = cantoOposto(tabuleiro, X)) != ERRO)
     return casa;
   // Regra 7
-  if ((casa = cantoVazio(tabuleiro)) != ERRO)
-    return casa;
+  //if ((casa = cantoVazio(tabuleiro)) != ERRO)
+  //  return casa;
   // Regra 8
   if ((casa = ladoVazio(tabuleiro)) != ERRO)
     return casa;
