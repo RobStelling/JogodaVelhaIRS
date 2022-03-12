@@ -33,7 +33,7 @@
 // X e O devem ser potências de 2
 #define VAZIO 0
 #define X 1
-#define O 2
+#define O 4
 
 // Variáveis globais:
 // casas: tabuleiro, vetor de 9 posições, casa uma com VAZIO, X ou O
@@ -131,7 +131,7 @@ bool aciona(int casa) {
 
 // Prepara início do jogo
 void comecaJogo() {
-  int casa;
+  int casa, jogadores[] = {X, O};
 
   // Esvazia tabuleiro
   for (casa = 1; casa <= NUMCASAS; casa++)
@@ -141,11 +141,8 @@ void comecaJogo() {
   pisca(5, 25, X|O, TODOS);
   delay(1000);
 
-  // Sorteia quem começa
-  randomSeed(analogRead(0));
-
-  // Acende leds de quem começa
-  vez = random(X, O+1);
+  // Sorteia e acende leds de quem começa
+  vez = jogadores[random(2)];
   pisca(150, 1, vez, TODOS);
   lance = 0;
 }
@@ -166,6 +163,8 @@ void setup() {
   pinMode(pinoBuzzer, OUTPUT);
   // Prepara serial
   Serial.begin(9600);
+  // Gera semente
+  randomSeed(analogRead(0));
   comecaJogo();
 }
 

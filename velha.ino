@@ -43,60 +43,20 @@ int faltaUm(int tabuleiro[], int lado) {
   int i;
   // Horizontal
   for (i = 0; i < 9; i+=3) {
-    if (tabuleiro[i] == VAZIO &&
-        tabuleiro[i+1] == lado &&
-        tabuleiro[i+2] == lado)
-      return i+1;
-    if (tabuleiro[i+1] == VAZIO &&
-        tabuleiro[i] == lado &&
-        tabuleiro[i+2] == lado)
-      return i+2;
-    if (tabuleiro[i+2] == VAZIO &&
-        tabuleiro[i+1] == lado &&
-        tabuleiro[i] == lado)
-      return i+3;
+    if (tabuleiro[i]+tabuleiro[i+1]+tabuleiro[i+2] == 2*lado)
+      return tabuleiro[i] == VAZIO ? i+1 : (tabuleiro[i+1] == VAZIO ? i+2 : i+3);
   }
   // Vertical
   for (i = 0; i < 3; i++) {
-    if (tabuleiro[i] == VAZIO &&
-        tabuleiro[i+3] == lado &&
-        tabuleiro[i+6] == lado)
-      return i+1;
-    if (tabuleiro[i+3] == VAZIO &&
-        tabuleiro[i] == lado &&
-        tabuleiro[i+6] == lado)
-      return i+4;
-    if (tabuleiro[i+6] == VAZIO &&
-        tabuleiro[i+3] == lado &&
-        tabuleiro[i] == lado)
-      return i+7;
+    if (tabuleiro[i]+tabuleiro[i+3]+tabuleiro[i+6] == 2*lado)
+      return tabuleiro[i] == VAZIO ? i+1 : (tabuleiro[i+3] == VAZIO ? i+4 : i+7);
   }
   // Diagonal principal
-  if (tabuleiro[0] == VAZIO &&
-      tabuleiro[4] == lado &&
-      tabuleiro[8] == lado)
-    return 1;
-  if (tabuleiro[4] == VAZIO &&
-      tabuleiro[0] == lado &&
-      tabuleiro[8] == lado)
-    return 5;
-  if (tabuleiro[8] == VAZIO &&
-      tabuleiro[4] == lado &&
-      tabuleiro[0] == lado)
-    return 9;
+  if (tabuleiro[0]+tabuleiro[4]+tabuleiro[8] == 2*lado)
+    return tabuleiro[0] == VAZIO ? 1 : (tabuleiro[4] == VAZIO ? 5 : 9);
   // Diagonal secundária
-  if (tabuleiro[2] == VAZIO &&
-      tabuleiro[4] == lado &&
-      tabuleiro[6] == lado)
-    return 3;
-  if (tabuleiro[4] == VAZIO &&
-      tabuleiro[2] == lado &&
-      tabuleiro[6] == lado)
-    return 5;
-  if (tabuleiro[6] == VAZIO &&
-      tabuleiro[4] == lado &&
-      tabuleiro[2] == lado)
-    return 7;
+  if (tabuleiro[2]+tabuleiro[4]+tabuleiro[6] == 2*lado)
+    return tabuleiro[2] == VAZIO ? 3 : (tabuleiro[4] == VAZIO ? 5 : 7);
   // Não tem casa vazia para completar
   return ERRO;
 }
@@ -262,6 +222,7 @@ int velhaNewellESimon(int tabuleiro[]) {
   // Regra 7
   if ((casa = cantoVazio(tabuleiro)) != ERRO)
     return casa;
+  // Regra 8
   if ((casa = ladoVazio(tabuleiro)) != ERRO)
     return casa;
 
