@@ -14,10 +14,33 @@
  */
 #define ERRO -1
 
+void mesclaVetor(int *vetor, int tamanho) {
+  // Retorna o vetor com o conteúdo reordenado
+  // aleatoriamente
+  int i, j, temp;
+  
+  for (i = 0; i<tamanho; i++) {
+    j = rand() % tamanho;
+    temp = vetor[j];
+    vetor[j] = vetor[i];
+    vetor[i] = temp;
+  }
+}
+
+int opostoDiagonal(int canto) {
+  switch (canto) {
+    case 1: return 9;
+    case 3: return 7;
+    case 7: return 3;
+    case 9: return 1;
+  }
+  return ERRO;
+}
+
 int faltaUm(int tabuleiro[], int lado) {
-  int i;
   // Retorna a primeira casa que encontrar em que falte
   // uma peça para o lado escolhido
+  int i;
   // Horizontal
   for (i = 0; i < 9; i+=3) {
     if (tabuleiro[i] == VAZIO &&
@@ -79,34 +102,56 @@ int faltaUm(int tabuleiro[], int lado) {
 }
 
 int cantoOposto(int tabuleiro[], int lado) {
-  int outroLado;
   // Cantos 1, 3, 7, 9
+  int i, outroLado, canto[] = {1, 3, 7, 9};
+
+  // Mescla o vetor para evitar
+  // que o algoritmo jogue sempre
+  // da mesma forma
+  mesclaVetor(canto, 4);
   outroLado = (lado == X ? O : X);
-  if (tabuleiro[0] == VAZIO && tabuleiro[8] == outroLado)
-    return 1;
-  if (tabuleiro[8] == VAZIO && tabuleiro[0] == outroLado)
-    return 9;
-  if (tabuleiro[2] == VAZIO && tabuleiro[6] == outroLado)
-    return 3;
-  if (tabuleiro[6] == VAZIO && tabuleiro[2] == outroLado)
-    return 7;
+  for (i = 0; i<4; i++) {
+    if (tabuleiro[canto[i]-1] == VAZIO && tabuleiro[opostoDiagonal(canto[i])-1] == outroLado)
+      return canto[i];
+  }
   return ERRO;
 }
 
 int cantoVazio(int tabuleiro[]) {
   // Cantos 1, 3, 7, 9
-  if (tabuleiro[0] == VAZIO)
-    return 1;
-  if (tabuleiro[8] == VAZIO)
-    return 9;
-  if (tabuleiro[2] == VAZIO)
-    return 3;
-  if (tabuleiro[6] == VAZIO)
-    return 7;
+  int i, canto[] = {1, 3, 7, 9};
+
+  // Mescla o vetor para evitar
+  // que o algoritmo jogue sempre
+  // da mesma forma
+  mesclaVetor(canto, 4);
+  for (i = 0; i<4; i++) {
+    if (tabuleiro[canto[i]-1] == VAZIO)
+      return canto[i];
+  }
   return ERRO;
 }
 
+int ladoVazio(int tabuleiro[]) {
+  // Lados 2, 4, 6, 8
+  int i, lados[] = {2, 4, 6, 8};
+
+  // Mescla o vetor para evitar
+  // que o algoritmo jogue sempre
+  // da mesma forma
+  mesclaVetor(lados, 4);
+  for (i = 0; i<4; i++) {
+    if (tabuleiro[lados[i]-1] == VAZIO)
+      return lados[i];
+  }
+  return ERRO;
+
+}
+
+// Algoritmos do jogo da velha
 int velhaRandomico(int tabuleiro[]) {
+  // Joga randomicamente
+
   int casa;
   // Cuidado: risco de loop infinito
   do {
@@ -115,27 +160,66 @@ int velhaRandomico(int tabuleiro[]) {
   return casa+1;
 }
 
-int velhaGanha(int tabuleiro[]) {
+int velha1(int tabuleiro[]) {
   // Se puder ganhar ganha
   // Senão joga randomicamente
+  // Aplica apenas regra 1 de Newel & Simon
   int casa;
 
+  // Regra 1
   if ((casa = faltaUm(tabuleiro, X)) != ERRO)
     return casa;
 
   return velhaRandomico(tabuleiro);
 }
 
-int velhaGanhaBloqueia(int tabuleiro[]) {
+int velha2(int tabuleiro[]) {
+  // Se puder, bloqueia vitória do adversário
+  // Senão joga randomicamente
+  // Aplica apenas regra 2 de Newel & Simon
+  int casa;
+
+  // Regra 2
+  if ((casa = faltaUm(tabuleiro, O)) != ERRO)
+    return casa;
+
+  return velhaRandomico(tabuleiro);
+}
+
+int velha1e2(int tabuleiro[]) {
   // Se puder ganhar ganha
   // Se puder bloquear, bloqueia
   // Senão joga randomicamente
+  // Aplica regras 1 e 2 de Newel & Simon
   int casa;
 
+  // Regra 1
   if ((casa = faltaUm(tabuleiro, X)) != ERRO)
     return casa;
+  // Regra 2
   if ((casa = faltaUm(tabuleiro, O)) != ERRO)
     return casa;
+
+  return velhaRandomico(tabuleiro);
+}
+
+int velha1e2e5(int tabuleiro[]) {
+  // Se puder ganhar, ganha
+  // Se puder bloquear o adversário bloqueia
+  // Joga no centro se estiver disponível
+  // Senão joga randomicamente
+  // Aplica regras 1, 2 e 5 de Newel e Simon
+
+  int casa;
+  // Regra 1
+  if ((casa = faltaUm(tabuleiro, X)) != ERRO)
+    return casa;
+  // Regra 2
+  if ((casa = faltaUm(tabuleiro, O)) != ERRO)
+    return casa;
+  // Regra 5
+  if (tabuleiro[4] == VAZIO)
+    return 5;
 
   return velhaRandomico(tabuleiro);
 }
@@ -167,6 +251,8 @@ int velhaNewellESimon(int tabuleiro[]) {
   // Regra 2
   if ((casa = faltaUm(tabuleiro, O)) != ERRO)
     return casa;
+  // Regra 3
+  // Regra 4
   // Regra 5
   if (tabuleiro[4] == VAZIO)
     return 5;
@@ -176,7 +262,8 @@ int velhaNewellESimon(int tabuleiro[]) {
   // Regra 7
   if ((casa = cantoVazio(tabuleiro)) != ERRO)
     return casa;
+  if ((casa = ladoVazio(tabuleiro)) != ERRO)
+    return casa;
 
   return velhaRandomico(tabuleiro);
-  
 }
