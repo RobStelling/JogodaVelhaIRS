@@ -28,6 +28,7 @@ void mesclaVetor(int *vetor, int tamanho) {
 }
 
 int opostoDiagonal(int canto) {
+  // Retorna o canto oposto de uma casa
   switch (canto) {
     case 1: return 9;
     case 3: return 7;
@@ -40,7 +41,7 @@ int opostoDiagonal(int canto) {
 // Usado nas regras 1 e 2
 int faltaUm(int tabuleiro[], int lado) {
   // Retorna a primeira casa que encontrar em que falte
-  // uma peça para o lado escolhido
+  // uma peça para o lado ganhar
   int i;
   // Horizontal
   for (i = 0; i < 9; i+=3) {
@@ -63,46 +64,64 @@ int faltaUm(int tabuleiro[], int lado) {
 }
 
 // Usado na regra 3
-int triangulo(int tabuleiro[], int lado) {
+bool pertence(int j, int vetor[]) {
   int i;
+  for (i = 0; vetor[i] != ERRO; i++)
+    if (vetor[i] == j)
+      return true;
+  return false;
+}
+
+void triangulos(int tabuleiro[], int lado, int vertices[]) {
+  // Retorna casas onde o lado pode completar um triângulo (duas opções de completar 3 casas)
+  int i = 0;
 
   // Primeira versão: casa a casa
   if (tabuleiro[0]+tabuleiro[1]+tabuleiro[2] == lado) { // Então primeira linha pode ser usada nos testes
-    // Testa primeiro a própria casa em um AND para se aproveitar do "curto-circuito" de C
-    if (tabuleiro[0] == VAZIO && (tabuleiro[4]+tabuleiro[8] == lado || tabuleiro[3]+tabuleiro[6] == lado))
-      return 1;
-    if (tabuleiro[1] == VAZIO && (tabuleiro[4]+tabuleiro[7] == lado))
-      return 2;
-    if (tabuleiro[2] == VAZIO && (tabuleiro[4]+tabuleiro[6] == lado || tabuleiro[5]+tabuleiro[8] == lado))
-      return 3;
+    // Testa primeiro a própria casa em um AND, para se aproveitar do "curto-circuito" de C
+    if (tabuleiro[0] == VAZIO && (tabuleiro[4]+tabuleiro[8] == lado || tabuleiro[3]+tabuleiro[6] == lado)) {
+      vertices[i++] = 1;
+    }
+    if (tabuleiro[1] == VAZIO && (tabuleiro[4]+tabuleiro[7] == lado)) {
+      vertices[i++] = 2;
+    }
+    if (tabuleiro[2] == VAZIO && (tabuleiro[4]+tabuleiro[6] == lado || tabuleiro[5]+tabuleiro[8] == lado)) {
+      vertices[i++] = 3;
+    }
   }
   if (tabuleiro[3]+tabuleiro[4]+tabuleiro[5] == lado) { // Então segunda linha pode ser usada nos testes
-    if (tabuleiro[3] == VAZIO && (tabuleiro[0]+tabuleiro[6] == lado))
-      return 4;
-    if (tabuleiro[4] == VAZIO && (tabuleiro[0]+tabuleiro[8] == lado || tabuleiro[1]+tabuleiro[7] == lado || tabuleiro[2]+tabuleiro[6] == lado))
-      return 5;
-    if (tabuleiro[5] == VAZIO && (tabuleiro[2]+tabuleiro[8] == lado))
-      return 6;
+    if (tabuleiro[3] == VAZIO && (tabuleiro[0]+tabuleiro[6] == lado)) {
+      vertices[i++] = 4;
+    }
+    if (tabuleiro[4] == VAZIO && (tabuleiro[0]+tabuleiro[8] == lado || tabuleiro[1]+tabuleiro[7] == lado || tabuleiro[2]+tabuleiro[6] == lado)) {
+      vertices[i++] = 5;
+    }
+    if (tabuleiro[5] == VAZIO && (tabuleiro[2]+tabuleiro[8] == lado)) {
+      vertices[i++] = 6;
+    }
   }
   if (tabuleiro[6]+tabuleiro[7]+tabuleiro[8] == lado) { // Então terceira linha pode ser usada nos testes
-    if (tabuleiro[6] == VAZIO && (tabuleiro[4]+tabuleiro[2] == lado || tabuleiro[3]+tabuleiro[0] == lado))
-      return 7;
-    if (tabuleiro[7] == VAZIO && (tabuleiro[4]+tabuleiro[1] == lado))
-      return 8;
-    if (tabuleiro[8] == VAZIO && (tabuleiro[4]+tabuleiro[0] == lado || tabuleiro[5]+tabuleiro[2] == lado))
-      return 9;
+    if (tabuleiro[6] == VAZIO && (tabuleiro[4]+tabuleiro[2] == lado || tabuleiro[3]+tabuleiro[0] == lado)) {
+      vertices[i++] = 7;
+    }
+    if (tabuleiro[7] == VAZIO && (tabuleiro[4]+tabuleiro[1] == lado)) {
+      vertices[i++] = 8;
+    }
+    if (tabuleiro[8] == VAZIO && (tabuleiro[4]+tabuleiro[0] == lado || tabuleiro[5]+tabuleiro[2] == lado)) {
+      vertices[i++] = 9;
+    }
   }
-  return ERRO;
+  vertices[i] = ERRO;
 }
 
-// Usado na regra 5
+// Usado na regra 6
 int cantoOposto(int tabuleiro[], int lado) {
+  // Retorna um canto onde o canto oposto está ocupado pelo oponente
   // Cantos 1, 3, 7, 9
   int i, outroLado, canto[] = {1, 3, 7, 9};
 
-  // Mescla o vetor para evitar
-  // que o algoritmo jogue sempre
-  // da mesma forma
+  // Muda a ordem dos cantos, usado para evitar
+  // que o algoritmo jogue sempre da mesma forma
   mesclaVetor(canto, 4);
   outroLado = (lado == X ? O : X);
   for (i = 0; i<4; i++) {
@@ -114,12 +133,12 @@ int cantoOposto(int tabuleiro[], int lado) {
 
 // Usado na regra 7
 int cantoVazio(int tabuleiro[]) {
+  // Retorna um canto vazio disponível
   // Cantos 1, 3, 7, 9
   int i, canto[] = {1, 3, 7, 9};
 
-  // Mescla o vetor para evitar
-  // que o algoritmo jogue sempre
-  // da mesma forma
+  // Muda a ordem dos cantos, usado para evitar
+  // que o algoritmo jogue sempre da mesma forma
   mesclaVetor(canto, 4);
   for (i = 0; i<4; i++) {
     if (tabuleiro[canto[i]-1] == VAZIO)
@@ -133,9 +152,8 @@ int ladoVazio(int tabuleiro[]) {
   // Lados 2, 4, 6, 8
   int i, lados[] = {2, 4, 6, 8};
 
-  // Mescla o vetor para evitar
-  // que o algoritmo jogue sempre
-  // da mesma forma
+  // Muda a ordem dos lados, usado para evitar
+  // que o algoritmo jogue sempre da mesma forma
   mesclaVetor(lados, 4);
   for (i = 0; i<4; i++) {
     if (tabuleiro[lados[i]-1] == VAZIO)
@@ -239,28 +257,49 @@ int velhaNewellESimon(int tabuleiro[]) {
    * 7. Canto vazio: jogue num canto vazio.
    * 8. Lado vazio: jogue na casa do meio de qualquer dos lados.
    */
-  int casa;
+  int casa, vertices[7];
 
   // Regra 1
+  // 1. Ganhar: Se você tem duas peças numa linha, ponha a terceira.
   if ((casa = faltaUm(tabuleiro, X)) != ERRO)
     return casa;
   // Regra 2
+  // 2. Bloquear: Se o oponente tiver duas peças em linha, ponha a terceira para bloqueá-lo.
   if ((casa = faltaUm(tabuleiro, O)) != ERRO)
     return casa;
   // Regra 3
-  if ((casa = triangulo(tabuleiro, X)) != ERRO)
-    return casa;
+  // 3. Triângulo: Crie uma oportunidade em que você poderá ganhar de duas maneiras.
+  triangulos(tabuleiro, X, vertices);
+  if (vertices[0] != ERRO) { // Tem pelo menos um triângulo
+    return vertices[0];
+  }
   // Regra 4
+  // 4. Bloquear o Triângulo do oponente
+  triangulos(tabuleiro, O, vertices);
+
+  if (vertices[0] != ERRO) { // Tem pelo menos um triângulo em potencial
+    // Opção 1: Crie 2 peças em linha para forçar o oponente a se defender, contanto que não resulte nele criando um triângulo ou vencendo.
+
+    // Opção 2: Se existe uma configuração em que o oponente pode formar um triângulo, bloqueiem-no.
+    if (vertices[1] == ERRO) { // Só tem um triangulo em potencial
+      // Então bloqueia o triângulo!
+      return vertices[0];
+    }
+  }
   // Regra 5
+  // 5. Centro: Jogue no centro.
   if (tabuleiro[4] == VAZIO)
     return 5;
   // Regra 6
+  // 6. Canto oposto: Se o oponente está no canto, jogo no canto oposto.
   if ((casa = cantoOposto(tabuleiro, X)) != ERRO)
     return casa;
   // Regra 7
+  // 7. Canto vazio: jogue num canto vazio.
   if ((casa = cantoVazio(tabuleiro)) != ERRO)
     return casa;
   // Regra 8
+  // 8. Lado vazio: jogue na casa do meio de qualquer dos lados.
   if ((casa = ladoVazio(tabuleiro)) != ERRO)
     return casa;
 
