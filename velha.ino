@@ -44,7 +44,7 @@ int faltaUm(int tabuleiro[], int lado) {
   // uma peça para o lado ganhar
   int i;
   // Horizontal
-  for (i = 0; i < 9; i+=3) {
+  for (i = 0; i < NUMCASAS; i+=3) {
     if (tabuleiro[i]+tabuleiro[i+1]+tabuleiro[i+2] == 2*lado)
       return tabuleiro[i] == VAZIO ? i+1 : (tabuleiro[i+1] == VAZIO ? i+2 : i+3);
   }
@@ -112,6 +112,63 @@ void triangulos(int tabuleiro[], int lado, int vertices[]) {
     }
   }
   vertices[i] = ERRO;
+}
+
+// Usado na regra 4
+int completa(int tabuleiro[], int a, int b, int c, int lado, int proibido[]) {
+  // Ameaça completar uma linha desde que a ameaça
+  // não seja em uma das casas proibidas
+  if (tabuleiro[a] == lado) {
+    if (!pertence(tabuleiro[b], proibido))
+      return c;
+    if (!pertence(tabuleiro[c], proibido))
+      return b;
+  }
+
+  if (tabuleiro[b] == lado) {
+    if (!pertence(tabuleiro[a], proibido))
+      return c;
+    if (!pertence(tabuleiro[c], proibido))
+      return a;
+  }
+
+  if (tabuleiro[c] == lado) {
+    if (!pertence(tabuleiro[a], proibido))
+      return b;
+    if (!pertence(tabuleiro[b], proibido))
+      return a;
+  }
+
+  return ERRO;
+}
+
+int ameaca3(int tabuleiro[], int lado, int proibido[]) {
+  // Retorna uma casa em que o lado ameaça completar 3 mas a casa que completa
+  // não está na lista de casas proibidas
+  int i, casa;
+
+  // Horizontais
+  for (i = 0; i < NUMCASAS; i+=3) {
+    if (tabuleiro[i]+tabuleiro[i+1]+tabuleiro[i+2] == lado)
+      if ((casa = completa(tabuleiro, i, i+1, i+2, lado, proibido)) != ERRO)
+        return casa+1;
+  }
+  // Vertical
+  for (i = 0; i < 3; i++) {
+    if (tabuleiro[i]+tabuleiro[i+3]+tabuleiro[i+6] == lado)
+      if ((casa = completa(tabuleiro, i, i+3, i+6, lado, proibido)) != ERRO)
+        return casa+1;
+  }
+  // Diagonal principal
+  if (tabuleiro[0]+tabuleiro[4]+tabuleiro[8] == lado)
+      if ((casa = completa(tabuleiro, 0, 4, 8, lado, proibido)) != ERRO)
+        return casa+1;
+  // Diagonal secundária
+  if (tabuleiro[2]+tabuleiro[4]+tabuleiro[6] == 2*lado)
+      if ((casa = completa(tabuleiro, 2, 4, 6, lado, proibido)) != ERRO)
+        return casa+1;
+  // Não tem casa vazia para completar
+  return ERRO;
 }
 
 // Usado na regra 6
@@ -277,8 +334,10 @@ int velhaNewellESimon(int tabuleiro[]) {
   // 4. Bloquear o Triângulo do oponente
   triangulos(tabuleiro, O, vertices);
 
-  if (vertices[0] != ERRO) { // Tem pelo menos um triângulo em potencial
+  if (vertices[0] != ERRO) { // Oponente tem pelo menos um triângulo em potencial
     // Opção 1: Crie 2 peças em linha para forçar o oponente a se defender, contanto que não resulte nele criando um triângulo ou vencendo.
+    if ((casa = ameaca3(tabuleiro, X, vertices)) != ERRO)
+      return casa;
 
     // Opção 2: Se existe uma configuração em que o oponente pode formar um triângulo, bloqueiem-no.
     if (vertices[1] == ERRO) { // Só tem um triangulo em potencial
