@@ -74,46 +74,54 @@ bool pertence(int j, int vetor[]) {
 
 // Usado na regra 3 e 4
 void triangulos(int tabuleiro[], int lado, int vertices[]) {
-  // Retorna casas onde o lado pode completar um triângulo (duas opções de completar 3 casas)
   int i = 0;
+  if (tabuleiro[0] == VAZIO &&
+     (tabuleiro[1]+tabuleiro[2] == lado && tabuleiro[4]+tabuleiro[8] == lado ||
+      tabuleiro[1]+tabuleiro[2] == lado && tabuleiro[3]+tabuleiro[6] == lado ||
+      tabuleiro[4]+tabuleiro[8] == lado && tabuleiro[3]+tabuleiro[6] == lado))
+    vertices[i++] = 1;
 
-  // Linha a linha com diagonais
-  // Não parece ser necessário incluir testes nas verticais
-  if (tabuleiro[0]+tabuleiro[1]+tabuleiro[2] == lado) { // Então primeira linha pode ser usada nos testes
-    // Testa primeiro a própria casa em um AND, para se aproveitar do "curto-circuito" de C
-    if (tabuleiro[0] == VAZIO && (tabuleiro[4]+tabuleiro[8] == lado || tabuleiro[3]+tabuleiro[6] == lado)) {
-      vertices[i++] = 1;
-    }
-    if (tabuleiro[1] == VAZIO && (tabuleiro[4]+tabuleiro[7] == lado)) {
-      vertices[i++] = 2;
-    }
-    if (tabuleiro[2] == VAZIO && (tabuleiro[4]+tabuleiro[6] == lado || tabuleiro[5]+tabuleiro[8] == lado)) {
-      vertices[i++] = 3;
-    }
-  }
-  if (tabuleiro[3]+tabuleiro[4]+tabuleiro[5] == lado) { // Então segunda linha pode ser usada nos testes
-    if (tabuleiro[3] == VAZIO && (tabuleiro[0]+tabuleiro[6] == lado)) {
-      vertices[i++] = 4;
-    }
-    if (tabuleiro[4] == VAZIO && (tabuleiro[0]+tabuleiro[8] == lado || tabuleiro[1]+tabuleiro[7] == lado || tabuleiro[2]+tabuleiro[6] == lado)) {
-      vertices[i++] = 5;
-    }
-    if (tabuleiro[5] == VAZIO && (tabuleiro[2]+tabuleiro[8] == lado)) {
-      vertices[i++] = 6;
-    }
-  }
-  if (tabuleiro[6]+tabuleiro[7]+tabuleiro[8] == lado) { // Então terceira linha pode ser usada nos testes
-    if (tabuleiro[6] == VAZIO && (tabuleiro[4]+tabuleiro[2] == lado || tabuleiro[3]+tabuleiro[0] == lado)) {
-      vertices[i++] = 7;
-    }
-    if (tabuleiro[7] == VAZIO && (tabuleiro[4]+tabuleiro[1] == lado)) {
-      vertices[i++] = 8;
-    }
-    if (tabuleiro[8] == VAZIO && (tabuleiro[4]+tabuleiro[0] == lado || tabuleiro[5]+tabuleiro[2] == lado)) {
-      vertices[i++] = 9;
-    }
-  }
+  if (tabuleiro[1] == VAZIO && (tabuleiro[0]+tabuleiro[2] == lado && tabuleiro[4]+tabuleiro[7] == lado))
+    vertices[i++] = 2;
+
+  if (tabuleiro[2] == VAZIO &&
+     (tabuleiro[0]+tabuleiro[1] == lado && tabuleiro[4]+tabuleiro[6] == lado ||
+      tabuleiro[0]+tabuleiro[1] == lado && tabuleiro[5]+tabuleiro[8] == lado ||
+      tabuleiro[4]+tabuleiro[6] == lado && tabuleiro[5]+tabuleiro[8] == lado))
+    vertices[i++] = 3;
+
+  if (tabuleiro[3] == VAZIO && (tabuleiro[0]+tabuleiro[6] == lado && tabuleiro[4]+tabuleiro[5] == lado))
+    vertices[i++] = 4;
+
+  // Não é necessário testar para a casa 5 porque esta casa será sempre ocupada
+  // antes de ser possível formar um triângulo (no primeiro lance do humano ou do computador)
+  
+  if (tabuleiro[5] == VAZIO && (tabuleiro[2]+tabuleiro[8] == lado && tabuleiro[3]+tabuleiro[4] == lado))
+    vertices[i++] = 6;
+  
+  if (tabuleiro[6] == VAZIO &&
+     (tabuleiro[0]+tabuleiro[3] == lado && tabuleiro[4]+tabuleiro[2] == lado ||
+      tabuleiro[0]+tabuleiro[3] == lado && tabuleiro[7]+tabuleiro[8] == lado ||
+      tabuleiro[4]+tabuleiro[2] == lado && tabuleiro[7]+tabuleiro[8] == lado))
+    vertices[i++] = 7;
+
+  if (tabuleiro[7] == VAZIO && (tabuleiro[1]+tabuleiro[4] == lado && tabuleiro[6]+tabuleiro[8] == lado))
+    vertices[i++] = 8;
+
+  if (tabuleiro[8] == VAZIO &&
+     (tabuleiro[2]+tabuleiro[5] == lado && tabuleiro[0]+tabuleiro[4] == lado ||
+      tabuleiro[2]+tabuleiro[5] == lado && tabuleiro[6]+tabuleiro[7] == lado ||
+      tabuleiro[0]+tabuleiro[4] == lado && tabuleiro[6]+tabuleiro[7] == lado))
+    vertices[i++] = 9;
+
   vertices[i] = ERRO;
+}
+
+void printVetor(int vetor[]) {
+  int i;
+  for (i = 0; vetor[i] != ERRO; i++) {
+    Serial.println(vetor[i]);
+  }
 }
 
 // Usado na regra 4
@@ -121,24 +129,24 @@ int completa(int tabuleiro[], int a, int b, int c, int lado, int proibido[]) {
   // Ameaça completar uma linha desde que a ameaça
   // não seja em uma das casas proibidas
   if (tabuleiro[a] == lado) {
-    if (!pertence(tabuleiro[b], proibido))
-      return c;
-    if (!pertence(tabuleiro[c], proibido))
-      return b;
+    if (!pertence(b+1, proibido))
+      return c+1;
+    if (!pertence(c+1, proibido))
+      return b+1;
   }
 
   if (tabuleiro[b] == lado) {
-    if (!pertence(tabuleiro[a], proibido))
-      return c;
-    if (!pertence(tabuleiro[c], proibido))
-      return a;
+    if (!pertence(a+1, proibido))
+      return c+1;
+    if (!pertence(c+1, proibido))
+      return a+1;
   }
 
   if (tabuleiro[c] == lado) {
-    if (!pertence(tabuleiro[a], proibido))
-      return b;
-    if (!pertence(tabuleiro[b], proibido))
-      return a;
+    if (!pertence(a+1, proibido))
+      return b+1;
+    if (!pertence(b+1, proibido))
+      return a+1;
   }
 
   return ERRO;
@@ -153,22 +161,22 @@ int ameaca3(int tabuleiro[], int lado, int proibido[]) {
   for (i = 0; i < NUMCASAS; i+=3) {
     if (tabuleiro[i]+tabuleiro[i+1]+tabuleiro[i+2] == lado)
       if ((casa = completa(tabuleiro, i, i+1, i+2, lado, proibido)) != ERRO)
-        return casa+1;
+        return casa;
   }
   // Vertical
   for (i = 0; i < 3; i++) {
     if (tabuleiro[i]+tabuleiro[i+3]+tabuleiro[i+6] == lado)
       if ((casa = completa(tabuleiro, i, i+3, i+6, lado, proibido)) != ERRO)
-        return casa+1;
+        return casa;
   }
   // Diagonal principal
   if (tabuleiro[0]+tabuleiro[4]+tabuleiro[8] == lado)
       if ((casa = completa(tabuleiro, 0, 4, 8, lado, proibido)) != ERRO)
-        return casa+1;
+        return casa;
   // Diagonal secundária
   if (tabuleiro[2]+tabuleiro[4]+tabuleiro[6] == 2*lado)
       if ((casa = completa(tabuleiro, 2, 4, 6, lado, proibido)) != ERRO)
-        return casa+1;
+        return casa;
   // Não tem casa vazia para completar
   return ERRO;
 }
