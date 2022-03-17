@@ -9,7 +9,7 @@
  * Cada casa pode conter:
  * 0: Casa vazia
  * 1: X - Computador
- * 2: O - Humano
+ * 4: O - Humano
  * Retorno: número da casa (entre 1 e 9) onde o computador jogará
  */
 #define ERRO -1
@@ -28,7 +28,7 @@ void mesclaVetor(int *vetor, int tamanho) {
 }
 
 int opostoDiagonal(int canto) {
-  // Retorna o canto oposto de uma casa
+  // Retorna o canto oposto de um canto
   switch (canto) {
     case 1: return 9;
     case 3: return 7;
@@ -72,11 +72,13 @@ bool pertence(int j, int vetor[]) {
   return false;
 }
 
+// Usado na regra 3 e 4
 void triangulos(int tabuleiro[], int lado, int vertices[]) {
   // Retorna casas onde o lado pode completar um triângulo (duas opções de completar 3 casas)
   int i = 0;
 
-  // Primeira versão: casa a casa
+  // Linha a linha com diagonais
+  // Não parece ser necessário incluir testes nas verticais
   if (tabuleiro[0]+tabuleiro[1]+tabuleiro[2] == lado) { // Então primeira linha pode ser usada nos testes
     // Testa primeiro a própria casa em um AND, para se aproveitar do "curto-circuito" de C
     if (tabuleiro[0] == VAZIO && (tabuleiro[4]+tabuleiro[8] == lado || tabuleiro[3]+tabuleiro[6] == lado)) {
@@ -338,7 +340,6 @@ int velhaNewellESimon(int tabuleiro[]) {
     // Opção 1: Crie 2 peças em linha para forçar o oponente a se defender, contanto que não resulte nele criando um triângulo ou vencendo.
     if ((casa = ameaca3(tabuleiro, X, vertices)) != ERRO)
       return casa;
-
     // Opção 2: Se existe uma configuração em que o oponente pode formar um triângulo, bloqueiem-no.
     if (vertices[1] == ERRO) { // Só tem um triangulo em potencial
       // Então bloqueia o triângulo!
