@@ -305,7 +305,7 @@ int velha1e2e5(int tabuleiro[]) {
   return velhaRandomico(tabuleiro);
 }
 
-int velhaNewellESimon(int tabuleiro[]) {
+int velhaNewellESimon(int tabuleiro[], int nivel) {
   /*
    * Implementação do algoritmo da velha de Newell e Simon de 1972
    * Referências: https://en.wikipedia.org/wiki/Tic-tac-toe#Strategy e
@@ -326,50 +326,65 @@ int velhaNewellESimon(int tabuleiro[]) {
    */
   int casa, vertices[7];
 
-  // Regra 1
-  // 1. Ganhar: Se você tem duas peças numa linha, ponha a terceira.
-  if ((casa = faltaUm(tabuleiro, X)) != ERRO)
-    return casa;
-  // Regra 2
-  // 2. Bloquear: Se o oponente tiver duas peças em linha, ponha a terceira para bloqueá-lo.
-  if ((casa = faltaUm(tabuleiro, O)) != ERRO)
-    return casa;
-  // Regra 3
-  // 3. Triângulo: Crie uma oportunidade em que você poderá ganhar de duas maneiras.
-  triangulos(tabuleiro, X, vertices);
-  if (vertices[0] != ERRO) { // Tem pelo menos um triângulo
-    return vertices[0];
-  }
-  // Regra 4
-  // 4. Bloquear o Triângulo do oponente
-  triangulos(tabuleiro, O, vertices);
-
-  if (vertices[0] != ERRO) { // Oponente tem pelo menos um triângulo em potencial
-    // Opção 1: Crie 2 peças em linha para forçar o oponente a se defender, contanto que não resulte nele criando um triângulo ou vencendo.
-    if ((casa = ameaca3(tabuleiro, X, vertices)) != ERRO)
+  if (nivel > 1) {
+    // Regra 1
+    // 1. Ganhar: Se você tem duas peças numa linha, ponha a terceira.
+    if ((casa = faltaUm(tabuleiro, X)) != ERRO)
       return casa;
-    // Opção 2: Se existe uma configuração em que o oponente pode formar um triângulo, bloqueiem-no.
-    if (vertices[1] == ERRO) { // Só tem um triangulo em potencial
-      // Então bloqueia o triângulo!
-      return vertices[0];
+    if (nivel > 2) {
+      // Regra 2
+      // 2. Bloquear: Se o oponente tiver duas peças em linha, ponha a terceira para bloqueá-lo.
+      if ((casa = faltaUm(tabuleiro, O)) != ERRO)
+        return casa;
+      if (nivel > 3) {
+        // Regra 3
+        // 3. Triângulo: Crie uma oportunidade em que você poderá ganhar de duas maneiras.
+        triangulos(tabuleiro, X, vertices);
+        if (vertices[0] != ERRO) { // Tem pelo menos um triângulo
+          return vertices[0];
+        }
+        if (nivel > 4) {
+          // Regra 4
+          // 4. Bloquear o Triângulo do oponente
+          triangulos(tabuleiro, O, vertices);
+
+          if (vertices[0] != ERRO) { // Oponente tem pelo menos um triângulo em potencial
+            // Opção 1: Crie 2 peças em linha para forçar o oponente a se defender, contanto que não resulte nele criando um triângulo ou vencendo.
+            if ((casa = ameaca3(tabuleiro, X, vertices)) != ERRO)
+              return casa;
+            // Opção 2: Se existe uma configuração em que o oponente pode formar um triângulo, bloqueiem-no.
+            if (vertices[1] == ERRO) { // Só tem um triangulo em potencial
+              // Então bloqueia o triângulo!
+              return vertices[0];
+            }
+          }
+          if (nivel > 5) {
+            // Regra 5
+            // 5. Centro: Jogue no centro.
+            if (tabuleiro[4] == VAZIO)
+              return 5;
+            if (nivel > 6) {
+              // Regra 6
+              // 6. Canto oposto: Se o oponente está no canto, jogo no canto oposto.
+              if ((casa = cantoOposto(tabuleiro, X)) != ERRO)
+                return casa;
+              if (nivel > 7) {
+                // Regra 7
+                // 7. Canto vazio: jogue num canto vazio.
+                if ((casa = cantoVazio(tabuleiro)) != ERRO)
+                  return casa;
+                if (nivel > 8) {
+                  // Regra 8
+                  // 8. Lado vazio: jogue na casa do meio de qualquer dos lados.
+                  if ((casa = ladoVazio(tabuleiro)) != ERRO)
+                    return casa;
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
-  // Regra 5
-  // 5. Centro: Jogue no centro.
-  if (tabuleiro[4] == VAZIO)
-    return 5;
-  // Regra 6
-  // 6. Canto oposto: Se o oponente está no canto, jogo no canto oposto.
-  if ((casa = cantoOposto(tabuleiro, X)) != ERRO)
-    return casa;
-  // Regra 7
-  // 7. Canto vazio: jogue num canto vazio.
-  if ((casa = cantoVazio(tabuleiro)) != ERRO)
-    return casa;
-  // Regra 8
-  // 8. Lado vazio: jogue na casa do meio de qualquer dos lados.
-  if ((casa = ladoVazio(tabuleiro)) != ERRO)
-    return casa;
-
   return velhaRandomico(tabuleiro);
 }

@@ -1,8 +1,13 @@
 // Lê estado de um botão
 bool leBotao(int casa) {
-  return !digitalRead(botao(casa));
+  return leBotaoPorta(porta(casa));
 }
-// ** Botão correspondente de uma casa
-int botao(int casa) {
+// Porta correspondente ao botão de uma casa
+int porta(int casa) {
   return casa + botao1 - 1;
+}
+
+// Lê o valor de um botão em uma dada porta
+bool leBotaoPorta(int porta) {
+  return !digitalRead(porta);
 }

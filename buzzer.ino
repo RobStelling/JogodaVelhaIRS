@@ -7,6 +7,16 @@ void buzzer() {
   return;
 }
 
+void conta(int vezes) {
+  int i;
+  for (i = 0; i < vezes; i++) {
+    tone(pinoBuzzer, NOTE_F6);
+    delay(100);
+    noTone(pinoBuzzer);
+    delay(100);
+  }
+}
+
 // Toca uma musica no buzzer
 // Baseado em: https://github.com/robsoncouto/arduino-songs
 void toca(int melodia[], int notas) {

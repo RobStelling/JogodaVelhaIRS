@@ -29,5 +29,7 @@
 #define botao8 (botao7+1)
 #define botao9 (botao8+1)
 
+#define botaoNivel 53
+
 // Buzzer
 #define pinoBuzzer (botao9+1)

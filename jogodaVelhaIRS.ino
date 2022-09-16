@@ -39,7 +39,7 @@
 // casas: tabuleiro, vetor de 9 posições, casa uma com VAZIO, X ou O
 // vez: vez de quem joga, X ou O
 // lance: número do lance da partida atual
-int casas[NUMCASAS], vez, lance;
+int casas[NUMCASAS], vez, lance, nivel = 1;
 
 // Operações em casas
 // ** Consulta a peça de uma casa
@@ -145,6 +145,7 @@ void comecaJogo() {
   vez = jogadores[random(2)];
   pisca(150, 1, vez, TODOS);
   lance = 0;
+  conta(nivel);
 }
 
 // Setup e loop
@@ -155,10 +156,13 @@ void setup() {
   for (led = o1; led <= x9; led++) {
     pinMode(led, OUTPUT);    
   }
-  // **Botões como entradas pullup
+  // Botões como entradas pullup
   for (botao = botao1; botao <= botao9; botao++) {
     pinMode(botao, INPUT_PULLUP);
   }
+
+  // Botão de nível de jogo
+  pinMode(botaoNivel, INPUT_PULLUP);
 
   pinMode(pinoBuzzer, OUTPUT);
   // Prepara serial
@@ -173,6 +177,7 @@ void setup() {
  */
 void loop() {
   int casa, resultado;
+
 
   // Se for a vez do jogador, vê que botão apertou
   if (vez == O) {
@@ -190,7 +195,7 @@ void loop() {
     }
   } else if (vez == X) {
     // Senão é a vez do Arduino...
-    casa = velhaNewellESimon(casas);
+    casa = velhaNewellESimon(casas, nivel);
     acende(X, casa);
     ocupa(casa, X);
     lance++;
@@ -200,6 +205,7 @@ void loop() {
   if (resultado = acabou()) {
     mostraResultado(resultado);
     // Joga de novo
+    nivel = (nivel + 1) % 9;
     comecaJogo();
   }
 }
