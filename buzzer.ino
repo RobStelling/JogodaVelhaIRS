@@ -9,8 +9,9 @@ void buzzer() {
 
 void conta(int vezes) {
   int i;
+  int notas[] = { NOTE_D4, NOTE_E4, NOTE_G4, NOTE_A4, NOTE_B4, NOTE_C5, NOTE_D5, NOTE_DS5 };
   for (i = 0; i < vezes; i++) {
-    tone(pinoBuzzer, NOTE_F6);
+    tone(pinoBuzzer, notas[vezes - 1]);
     delay(100);
     noTone(pinoBuzzer);
     delay(100);

@@ -206,7 +206,7 @@ void loop() {
     mostraResultado(resultado);
     // Muda o nível apenas se perdeu
     if (resultado == OGANHOU)
-      nivel = (nivel + 1) % 9;
+      nivel = (nivel % 8) + 1;
     // Joga de novo
     comecaJogo();
   }
